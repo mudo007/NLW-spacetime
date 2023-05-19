@@ -1,20 +1,26 @@
-import fastify from 'fastify';
+import fastify from 'fastify'
+import { PrismaClient } from '@prisma/client'
 
-const app = fastify();
-const serverPort = 1234;
+// imports reference
+const app = fastify()
+const prisma = new PrismaClient()
 
-//test route
-app.get('/hello', () => {
-  return 'Hello World';
-});
+// local variables -> should go to .env
+const serverPort = 1234
 
-//starts the server on localhost.
-//we need to add host: '0.0.0.0' because of docker
+// test route
+app.get('/hello', async () => {
+  const users = await prisma.user.findMany()
+  return users
+})
+
+// starts the server on localhost.
+// we need to add host: '0.0.0.0' because of docker
 app
   .listen({
     port: serverPort,
     host: '0.0.0.0',
   })
   .then(() => {
-    console.log(`HTTP server running on http://localhost:${serverPort}`);
-  });
+    console.log(`HTTP server running on http://localhost:${serverPort}`)
+  })

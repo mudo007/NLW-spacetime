@@ -13,8 +13,10 @@ services:
     container_name: nlwspace
     ports:
       - '8000:1234'
+      - '5555:5555'
     expose:
       - 8000
+      - 5555
     volumes:
       - ${PWD}:/app
     tty: true
