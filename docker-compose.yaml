@@ -12,11 +12,13 @@ services:
       - github-ssh-key
     container_name: nlwspace
     ports:
-      - '8000:1234'
+      - '3333:3333'
       - '5555:5555'
+      - '3000:3000'
     expose:
-      - 8000
+      - 3333
       - 5555
+      - 3000
     volumes:
       - ${PWD}:/app
     tty: true
