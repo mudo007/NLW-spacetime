@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* all defaults go into the body style*/}
+      {/* all defaults go into the body style */}
       <body
         className={`${roboto.variable} bg-gray-900 font-sans text-gray-100`}
       >
