@@ -1,18 +1,20 @@
 import fastify from 'fastify'
-import { PrismaClient } from '@prisma/client'
+import cors from '@fastify/cors'
+import { memoriesRoutes } from './routes/memories'
 
 // imports reference
 const app = fastify()
-const prisma = new PrismaClient()
+
+//configure cors, let's leave it all oppen for now
+app.register(cors, {
+  origin:true
+})
+
+//register routes
+app.register(memoriesRoutes)
 
 // local variables -> should go to .env
-const serverPort = 1234
-
-// test route
-app.get('/hello', async () => {
-  const users = await prisma.user.findMany()
-  return users
-})
+const serverPort = 3333
 
 // starts the server on localhost.
 // we need to add host: '0.0.0.0' because of docker
