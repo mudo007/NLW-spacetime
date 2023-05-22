@@ -30,8 +30,6 @@ export async function authRoutes(app: FastifyInstance){
       }
     )
 
-    console.log(accessTokenResponse);
-
     const { access_token:accessToken} = accessTokenResponse.data
 
     const userResponse = await axios.get('https://api.github.com/user', {
@@ -51,7 +49,6 @@ export async function authRoutes(app: FastifyInstance){
 
     const githubUserInfo = userSchema.parse(userResponse.data)
 
-    console.log(githubUserInfo);
 
     //create user in our Database in case it does not exist yer
     let user 
