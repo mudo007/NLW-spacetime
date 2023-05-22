@@ -5,12 +5,11 @@ import { prisma } from "../lib/prisma";
 import { userInfo } from "os";
 
 export async function authRoutes(app: FastifyInstance){
-  app.post('/signup', async (request) => {
+  app.post('/register', async (request) => {
     const bodySchema = z.object({
       code: z.string(),
     })
-    
-    const {code } = bodySchema.parse(request.body)
+    const { code } = bodySchema.parse(request.body)
 
     const accessTokenResponse = await axios.post(
       //url
@@ -31,7 +30,9 @@ export async function authRoutes(app: FastifyInstance){
       }
     )
 
-    const { accessToken} = accessTokenResponse.data
+    console.log(accessTokenResponse);
+
+    const { access_token:accessToken} = accessTokenResponse.data
 
     const userResponse = await axios.get('https://api.github.com/user', {
       headers: {
@@ -39,15 +40,18 @@ export async function authRoutes(app: FastifyInstance){
       }
     })
 
+
     //user validation
     const userSchema = z.object({
       id: z.number(),
       login: z.string(),
-      name: z.string(),
+      name: z.string().nullable().transform(value => value ?? ''),
       avatar_url: z.string().url(),
     })
 
     const githubUserInfo = userSchema.parse(userResponse.data)
+
+    console.log(githubUserInfo);
 
     //create user in our Database in case it does not exist yer
     let user 
