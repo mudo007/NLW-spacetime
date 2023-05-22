@@ -1,6 +1,9 @@
+import 'dotenv/config'
 import fastify from 'fastify'
 import cors from '@fastify/cors'
+import jwt from '@fastify/jwt'
 import { memoriesRoutes } from './routes/memories'
+import { authRoutes } from './routes/auth'
 
 // imports reference
 const app = fastify()
@@ -9,9 +12,14 @@ const app = fastify()
 app.register(cors, {
   origin:true
 })
+app.register(jwt,{
+  //should be a long random string for production
+  secret:'spacetime'
+})
 
 //register routes
 app.register(memoriesRoutes)
+app.register(authRoutes)
 
 // local variables -> should go to .env
 const serverPort = 3333

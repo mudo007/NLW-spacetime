@@ -1,11 +1,20 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import z from 'zod'
+import { request } from "http";
 
 export async function memoriesRoutes(app:FastifyInstance) {
+  //global stuff for these routes
+  app.addHook('preHandler', async (request) => {
+    await request.jwtVerify();
+  })
+
 //list memories
-app.get('/memories', async () => {
+app.get('/memories', async (request) => {
   const memories = await prisma.memory.findMany({
+    where: {
+      userId: request.user.sub,
+    },
     orderBy:{
       createdAt: 'asc',
     }
@@ -20,7 +29,7 @@ app.get('/memories', async () => {
   })
 })
 //fetch a single memory
-app.get('/memories/:id', async (request) => {
+app.get('/memories/:id', async (request, reply) => {
   //create a zod validation object
   const paramsSchema = z.object({
     id: z.string().uuid(),
@@ -35,6 +44,11 @@ app.get('/memories/:id', async (request) => {
       id,
     },
   })
+
+  //short circuit with unauthorized if the user does not own the memory
+  if (!memory.isPublic &&  memory.userId !== request.user.sub){
+    return reply.status(401).send()
+  }
   
   return memory
   
@@ -59,14 +73,14 @@ app.post('/memories', async (request) => {
       content,
       coverUrl,
       isPublic,
-      userId:'82462c2e-ba65-4ae7-976e-20d5e8681458'
+      userId: request.user.sub,
     }
   })
   
   return memory
 })
 //update a memory 
-app.put('/memories/:id', async (request) => {
+app.put('/memories/:id', async (request, reply) => {
     //create a zod validation object for the id
     const paramsSchema = z.object({
       id: z.string().uuid(),
@@ -83,7 +97,19 @@ app.put('/memories/:id', async (request) => {
   //extract data from the body
   const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
 
-  const memory = await prisma.memory.update({
+  //check if the memory exists
+  let memory = await prisma.memory.findUniqueOrThrow({
+    where : {
+      id,
+    }
+  })
+
+  //short circuit with unauthorized if the user does not own the memory
+  if (memory.userId !== request.user.sub){
+    return reply.status(401).send()
+  }
+
+  memory = await prisma.memory.update({
     where:{
       id,
     },
@@ -99,16 +125,28 @@ app.put('/memories/:id', async (request) => {
 })
 
 //delete a single memory
-app.delete('/memories/:id', async (request) => {
+app.delete('/memories/:id', async (request, reply) => {
   //create a zod validation object
   const paramsSchema = z.object({
     id: z.string().uuid(),
   })
   //parse the request objet with the zod validation object
   const {id} = paramsSchema.parse(request.params)
+
+  //check if the memory exists
+  let memory = await prisma.memory.findUniqueOrThrow({
+    where : {
+      id,
+    }
+  })
+
+  //short circuit with unauthorized if the user does not own the memory
+  if (memory.userId !== request.user.sub){
+    return reply.status(401).send()
+  }
   
   //fetch memory from database
-  const memory = await prisma.memory.delete({
+  memory = await prisma.memory.delete({
     where:{
       //id: id
       id,
