@@ -9,14 +9,16 @@ export async function GET(request: NextRequest) {
   const registerResponse = await api.post('/register', {
     code: userGithubCode,
   })
+  // this cookie is set on the middleware to implement the authorization flow
+  const redirectTo = request.cookies.get('redirectTo')?.value
 
   const { userJwt } = registerResponse.data
 
   // compute the JWT expiration of i month in seconds
   const jwtOneMonthExpirationInSeconds: number = 30 * 24 * 60 * 60
 
-  // redirect the user to our root page
-  const redirectURL = new URL('/', request.url)
+  // redirect the user to our root page or to the origin page
+  const redirectURL = redirectTo ?? new URL('/', request.url)
 
   return NextResponse.redirect(redirectURL, {
     headers: {
