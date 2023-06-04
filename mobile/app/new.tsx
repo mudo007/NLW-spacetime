@@ -49,6 +49,7 @@ export default function NewMemory() {
         </TouchableOpacity>
         <TextInput
           multiline
+          textAlignVertical="top"
           className="p-0 font-body text-lg text-gray-50"
           placeholderTextColor="#56565a"
           placeholder="Fique livre para adicionar fotos, vídeos, e relatos sobre essa
