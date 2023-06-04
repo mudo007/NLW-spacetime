@@ -65,19 +65,26 @@ app.post('/memories', async (request) => {
     isPublic: z.coerce.boolean().default(false),
   })
   //extract data from the body
-  const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
-  
-  //create it inside the database
-  const memory = await prisma.memory.create({
-    data:{
-      content,
-      coverUrl,
-      isPublic,
-      userId: request.user.sub,
-    }
-  })
-  
-  return memory
+  try{
+
+    const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
+    
+    console.log( content, coverUrl, isPublic)
+    //create it inside the database
+    const memory = await prisma.memory.create({
+      data:{
+        content,
+        coverUrl,
+        isPublic,
+        userId: request.user.sub,
+      }
+    })
+    
+    return memory
+  } catch (err){
+    console.log(err)
+    return 
+  }
 })
 //update a memory 
 app.put('/memories/:id', async (request, reply) => {
