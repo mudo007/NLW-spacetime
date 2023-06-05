@@ -6,6 +6,7 @@ Project to learn React (&native), Next.js, TailwindCSS. Typescript, Expo, Fastif
 
 ### Refactoring
 - local environment setup instructions
+- checkout the useLoader hook: https://medium.com/@emmanuelodii80/bye-bye-usestate-useeffect-revolutionizing-react-development-d91f95891adb
 - decouple database interactions
 - add tests to business logics
 - iaC for containerized deployment
